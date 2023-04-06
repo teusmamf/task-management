@@ -16,28 +16,33 @@ export class TasksService {
     ){
 
     }
-    // getAllTaks() : Task[] {
-    //     return this.TasksArray;
-    // }
 
-    // createTask(createTaskdto: createTaskdto) : Task{
-    //     const {title , description } = createTaskdto ?? {};
+    async getTasks(filterDto : getTasksfilterdto): Promise<Task[]>{
+            const {status , search } = filterDto;
     
-    //     const task : Task = {
-    //         id: uuid(),
-    //         title,
-    //         description,
-    //         status : TasksStatus.OPEN,
-    //     };
+            const Query = this.TaskRepository.createQueryBuilder('task');
+    
+            if(status){
 
-    //     this.TasksArray.push(task);
-    //     return task;
-    // }
+                Query.andWhere('task.status = :status', {status})
 
+            }if(search){
 
+                Query.andWhere(
+                    'LOWER(task.title) LIKE LOWER(:search) OR LOWER(task.description) LIKE LOWER(:search)',
+                    {search : `%${search}%`}, // os sinais de porcentagem fazem com que na minha busca eu consiga filtrar por valores parecidos com o que eu coloquei
+                    // como se eu pesquisar por Clean , ele também vai achar Clea , Cle etc..
+                );
+            }
 
-   
-        async createAtask(createataskDto : createTaskdto ): Promise<Task>{
+            const tasks = await Query.getMany();
+    
+            return tasks;
+
+    
+      }
+
+   async createAtask(createataskDto : createTaskdto ): Promise<Task>{
             const { title , description } = createataskDto;
     
             const task = this.TaskRepository.create({
@@ -49,11 +54,6 @@ export class TasksService {
             await this.TaskRepository.save(task);
             return task;
         }
-        
-        
-    
-    
-    
         
     
     async getTaskbyID(id:string): Promise<Task>{
@@ -76,24 +76,13 @@ export class TasksService {
        
     }
 
-    // deleteTask(id: string):{ task : Task , messsage : string}{
-
-    //     const taskToDelete = this.TasksArray.find(task => task.id === id);
-    //     if(!taskToDelete){
-    //         throw new NotFoundException(TaskMessages.TASK_NOT_FOUND)
-    //     }
-    //     this.TasksArray = this.TasksArray.filter(task => task.id !== id);
-    //     return {messsage : TaskMessages.TASK_DELETED , task : taskToDelete};
-    // }
-
-
-    // updateTask(id : string , status : TasksStatus): Task {
+    async updateTask(id : string , status : TasksStatus): Promise<Task> {
         
-    //     const task = this.getAsingletask(id);
-    //     task.status = status;
-
-    //     return task;
-    // }
+        const task = await this.getTaskbyID(id);
+        task.status = status;
+        this.TaskRepository.save(task);
+        return task;
+    }
 
     // getTaskswithfilters(filterDto : getTasksfilterdto){
     //     const {status , search} = filterDto;

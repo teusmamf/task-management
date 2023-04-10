@@ -15,5 +15,11 @@ signUp(@Body() Userdto : Userdto ):Promise<void>{
  return this.authService.createUser(Userdto);
 }
 
+@Post('/signIn')
+signIn(
+    @Body() Userdto: Userdto
+):Promise<{accessToken:String}>{
+    return this.authService.signIn(Userdto);
+}
 
 }

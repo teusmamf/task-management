@@ -6,15 +6,12 @@ import { Userdto } from './dto/create-user-dto';
 
 @Injectable()
 export class AuthService {
+  constructor(
+    @InjectRepository(UserRepository)
+    private userRepository: UserRepository,
+  ) {}
 
-    constructor(
-        @InjectRepository(UserRepository)
-        private userRepository : UserRepository,
-    ){}
-    
-    async Signup(Userdto: Userdto):Promise<void>{
-        return this.userRepository.createUser(Userdto);
-
-    }    
-            
+  async Signup(Userdto: Userdto): Promise<void> {
+    return this.userRepository.createUser(Userdto);
+  }
 }

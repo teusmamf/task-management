@@ -1,5 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
+import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import * as bcrypt from "bcrypt";
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -10,4 +10,9 @@ export class User {
 
   @Column()
   password: string;
+
+  async checkPassword(password: string): Promise<boolean> {
+    const match = await bcrypt.compare(password, this.password);
+    return match;
+  }
 }

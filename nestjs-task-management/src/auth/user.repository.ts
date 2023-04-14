@@ -1,31 +1,25 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository, Repository, getCustomRepository } from 'typeorm';
 import { User } from './user.entity';
 import { Userdto } from './dto/create-user-dto';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @EntityRepository(User)
-export class UserRepository extends Repository<User> {
+export class UserRepository extends Repository<User>{
 
+  async createUser(userDto: Userdto): Promise<void> {
+    const { username, password } = userDto;
 
+    const user = new User();
+    user.username = username;
+    user.password = password;
 
-
-
-    /*criando o usuário --------------\\\\---------*/
-    
-  async createUser(Userdto: Userdto): Promise<void> {
-    const { username, password } = Userdto;
-    console.log(
-      'Creating user with username:',
-      username,
-      'and password:',
-      password,
-    );
-
-    try {
-      const user = await this.create({ username, password });
-      console.log('Created user:', user);
-      await this.save(user);
-    } catch (error) {
-      console.log('Error creating user:', error.message);
-    }
+    await this.save(user);
   }
+
+  async findOneByUsername(username: string): Promise<User> {
+    return await this.findOne({where :{username}});
+  }
+
+
 }

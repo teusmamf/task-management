@@ -12,7 +12,7 @@ constructor (
 
 @Post('/signup')
 signUp(@Body() Userdto : Userdto ):Promise<void>{
- return this.authService.createUser(Userdto);
+ return this.authService.CreateUser(Userdto);
 }
 
 @Post('/signIn')

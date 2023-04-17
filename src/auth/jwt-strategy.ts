@@ -6,6 +6,8 @@ import { UserRepository } from "./user.repository";
 import { jwtPayload } from "./jwt-interface";
 import { User } from "./user.entity";
 import { FindOneOptions } from "typeorm";
+import { AuthService } from "./auth.service";
+import { log } from "console";
 
 
 @Injectable()
@@ -14,28 +16,26 @@ constructor(
 
     @InjectRepository(UserRepository)
     private UserRepository : UserRepository,
+    
 ){
     super({
-        secret:'topSecret2604',
+        secretOrKey:'topSecret2604',
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     })
 }
 
-async validate(payload : jwtPayload):Promise<User>{
+async validate(payload : jwtPayload): Promise<User>{
     const { username } = payload;
-    const options: FindOneOptions<User> = {
-      where: { username },
-    };
-    const user = await this.UserRepository.findOne(options);
-  
+    console.log(this.UserRepository);
+    
+    const user: User = await this.UserRepository.findOne({
+      where: { username : username }
+    });
+
     if(!user){
-
       throw new UnauthorizedException();
-
     }
-  
+
     return user;
   }
-  
-
 }

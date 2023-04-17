@@ -5,5 +5,5 @@ import { Userdto } from "./dto/create-user-dto";
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User>{
-
+    
 }

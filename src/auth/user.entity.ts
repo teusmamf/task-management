@@ -1,4 +1,4 @@
-import { Column, Entity, EntityRepository, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 
 

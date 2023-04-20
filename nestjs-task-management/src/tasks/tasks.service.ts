@@ -7,18 +7,23 @@ import { TasksRepository } from './tasks-repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './task-entity';
 import { title } from 'process';
+import { User } from 'src/auth/user.entity';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task)
     private TaskRepository: TasksRepository,
+    
   ) {}
 
-  async getTasks(filterDto: getTasksfilterdto): Promise<Task[]> {
+  async getTasks(filterDto: getTasksfilterdto, user : User): Promise<Task[]> {
     const { status, search } = filterDto;
 
     const Query = this.TaskRepository.createQueryBuilder('task');
+
+    Query.where('task.userId = :userId', { userId: user.id })
 
     if (status) {
       Query.andWhere('task.status = :status', { status });
@@ -36,25 +41,23 @@ export class TasksService {
     return tasks;
   }
 
-  async createAtask(createataskDto: createTaskdto): Promise<Task> {
-    const { title, description } = createataskDto;
-
-    const task = this.TaskRepository.create({
-      title,
-      description,
-      status: TasksStatus.OPEN,
-    });
-
+  async createTask(createTaskDto: createTaskdto, user: User, ): Promise<Task> {
+    const { title, description } = createTaskDto;
+    const task = new Task();
+    task.title = title;
+    task.description = description;
+    task.status = TasksStatus.OPEN;
+    task.user = user; // associar a tarefa ao usuário correto
     await this.TaskRepository.save(task);
     return task;
   }
+  
 
   async getTaskbyID(id: string): Promise<Task> {
     const found = await this.TaskRepository.findOne({ where: { id } });
     if (!found) {
       throw new NotFoundException(`Task with ID:${id} was not found`);
     }
-
     return found;
   }
 
@@ -74,23 +77,4 @@ export class TasksService {
     return task;
   }
 
-  // getTaskswithfilters(filterDto : getTasksfilterdto){
-  //     const {status , search} = filterDto;
-
-  //     let tasks = this.getAllTaks();
-
-  //     if(status){
-  //         tasks = tasks.filter((task) => task.status === status);
-  //     }
-  //     if(search){
-  //         tasks = tasks.filter((task) => {
-  //             if(task.title.includes(search) || task.description.includes(search)){
-  //                 return true;
-  //             }
-  //             return false
-  //         });
-  //     }
-
-  //     return tasks;
-  // }
 }

@@ -18,6 +18,8 @@ import { Task } from './task-entity';
 import { TasksStatus } from './tasks-status.enum';
 import { TasksService } from './tasks.service';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Getuser } from 'src/auth/get-user.decorator';
+import { User } from 'src/auth/user.entity';
 
 @Controller('tasks')
 export class TasksController {
@@ -28,8 +30,9 @@ export class TasksController {
   @Get()
   getTasks(
     @Query(ValidationPipe) filterDto: getTasksfilterdto,
+    user:User,
   ): Promise<Task[]> {
-    return this.taskService.getTasks(filterDto);
+    return this.taskService.getTasks(filterDto,user);
   }
 
   @Get('/:id')
@@ -51,8 +54,11 @@ export class TasksController {
   // }
 
   @Post('/create')
-  createaTask(@Body() createTaskdto: createTaskdto): Promise<Task> {
-    return this.taskService.createAtask(createTaskdto);
+  createaTask(
+    @Body() createTaskdto: createTaskdto,
+    @Getuser() user : User, 
+  ): Promise<Task> {
+    return this.taskService.createTask(createTaskdto,user);
   }
 
   @Delete('/:id')
